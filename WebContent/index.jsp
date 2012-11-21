@@ -110,9 +110,17 @@ window.key = "<%=key%>";
 				</div>
 			</div>
 			<div region="east" style="width: 200px;border-bottom: none;border-right: none;border-top: none;" >
-				<ul id="online" class="easyui-tree" style="padding: 5px 0;" data-options="animate:true">
-					<li iconCls="icon-users">SK群聊</li>
-				</ul>
+				<div class="easyui-layout" fit="true" border="false">
+					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;">	
+						<ul id="online" class="easyui-tree" style="padding: 5px 0;" data-options="animate:true">
+							<li iconCls="icon-users">SK群聊</li>
+						</ul>
+					</div>
+					<div region="south" style="height: 160px;border-bottom: none;border-right: none;border-left: none;padding: 3px;">
+						<p>后台代码：<br/><a href="https://github.com/btboys/sk" target="_blank">https://github.com/btboys/sk</a></p>
+						<p>作者：____′↘夏悸	<br/><a href="https://bbs.btboys.com" target="_blank">easyui社区出品</a></p>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
