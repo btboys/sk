@@ -3,7 +3,7 @@ package com.godson.websocket;
 import java.nio.CharBuffer;
 import java.util.Date;
 
-import net.sf.xsshtmlfilter.HTMLFilter;
+import com.godson.util.Utils;
 
 /**
  * 消息体
@@ -22,7 +22,8 @@ public class Msg {
 	}
 	
 	public String getContent() {
-		String cleanContent = new HTMLFilter().filter(content.toString());
+		String cleanContent = Utils.replseJs(content.toString());
+		cleanContent=cleanContent.replaceAll("<a href[^>]*>", "ok").replaceAll("</a>", "ok");
 		return cleanContent;
 	}
 	public Date getDate() {
@@ -31,6 +32,7 @@ public class Msg {
 	public Visitor getVisitor() {
 		return visitor;
 	}
-	
-	
+	public void setContent(CharBuffer content) {
+		this.content = content;
+	}
 }

@@ -1,6 +1,8 @@
 package com.godson.util;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,7 +64,7 @@ public final class Utils {
 				JSONObject obj = JSONObject.parseObject(result);
 				if (obj.getIntValue("code") == 0) {
 					String nickname = request.getParameter("nk");
-					nickname = new String(nickname.getBytes("8859_1"),"utf-8");
+					nickname = new String(nickname.getBytes("8859_1"), "utf-8");
 					String city = request.getParameter("city");
 					String province = request.getParameter("region");
 					String country = request.getParameter("country");
@@ -76,6 +78,51 @@ public final class Utils {
 			e.printStackTrace();
 		}
 		return vt;
+	}
+
+	public static String replseJs(String html) {
+		try {
+			Pattern replse1 = Pattern.compile("<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>", Pattern.CASE_INSENSITIVE);
+			Pattern replse2 = Pattern.compile("<[\\s]*?link[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?link[\\s]*?>", Pattern.CASE_INSENSITIVE);
+			Pattern replse3 = Pattern.compile("<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>", Pattern.CASE_INSENSITIVE);
+			Pattern replse4 = Pattern.compile("<[\\s]*?iframe[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?iframe[\\s]*?>", Pattern.CASE_INSENSITIVE);
+			Pattern replse5 = Pattern.compile("<(script|link|style|iframe)(.|\\n)*<\\/\\>\\s*");
+			Pattern replse6 = Pattern.compile("javascript");
+			Pattern replse7 = Pattern.compile("expression\\([^)]+\\)");
+			Pattern replse8 = Pattern.compile("<[\\s]*?link[^>]*?>", Pattern.CASE_INSENSITIVE);
+			Pattern replse9 = Pattern.compile("<[\\s]*?iframe[^>]*?>", Pattern.CASE_INSENSITIVE);
+
+			Matcher matcher1 = replse1.matcher(html);
+			html = matcher1.replaceAll("");
+
+			Matcher matcher2 = replse2.matcher(html);
+			html = matcher2.replaceAll("");
+
+			Matcher matcher3 = replse3.matcher(html);
+			html = matcher3.replaceAll("");
+
+			Matcher matcher4 = replse4.matcher(html);
+			html = matcher4.replaceAll("");
+
+			Matcher matcher5 = replse5.matcher(html);
+			html = matcher5.replaceAll("");
+
+			Matcher matcher6 = replse6.matcher(html);
+			html = matcher6.replaceAll(" ");
+
+			Matcher matcher7 = replse7.matcher(html);
+			html = matcher7.replaceAll("");
+
+			Matcher matcher8 = replse8.matcher(html);
+			html = matcher8.replaceAll(" ");
+
+			Matcher matcher9 = replse9.matcher(html);
+			html = matcher9.replaceAll(" ");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return html;
 	}
 
 	private Utils() {

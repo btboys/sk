@@ -52,6 +52,14 @@
 .icon-tip{
 	background:url('icons/tip.png') no-repeat;
 }
+.icon-users{
+	background:url('icons/users.png') no-repeat;
+}
+
+.icon-user{
+	background:url('icons/user.png') no-repeat;
+}
+
 
 .icon-mini-add{
 	background:url('icons/mini_add.png') no-repeat 2px 2px;

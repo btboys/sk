@@ -57,6 +57,7 @@ public class OnlineMessageInbound extends MessageInbound {
 		if(isOnline){
 			HashMap<String, Object> node = new HashMap<String, Object>();
 			node.put("id", key);
+			node.put("iconCls", "icon-user");
 			node.put("text", InitServlet.getSocketList().get(key).getVisitor().getNickname());
 			data = JSONArray.toJSONString(node);
 		}
@@ -87,6 +88,7 @@ public class OnlineMessageInbound extends MessageInbound {
 			SocketEntity socketEntity = onl.get(key);
 			HashMap<String, Object> node = new HashMap<String, Object>();
 			node.put("id", key);
+			node.put("iconCls", "icon-user");
 			node.put("text", socketEntity.getVisitor().getNickname());
 			childNode.add(node);
 		}

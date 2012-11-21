@@ -1,4 +1,7 @@
 var ws = null,sending = false;
+/**
+ * 建立信息服务通道
+ */
 function startWebSocket() {
 	if ('WebSocket' in window)
 		ws = new WebSocket(window.wsSer+"wsServices?nk="+window.nickName+"&key="+window.key);
@@ -8,14 +11,24 @@ function startWebSocket() {
 		alert("您的浏览器不支持！建议使用Chrome浏览器或者火狐浏览器!");
 
 	if(ws){
+		var temp = '<p><b>$1</b><sub>(<span title="$2">$3</span>) $4<sub></p>';
 		ws.onmessage = function(evt) {
 			var data = eval("("+evt.data+")");
+			var city = "未知";
+			var info = "IP:"+data.visitor.ip;
+			if(data.visitor.city){
+				city = data.visitor.cit;
+				info += " "+data.visitor.country + " " +data.visitor.province+ " " +data.visitor.isp;
+			}
 			var $mp = $("#msgPanel");
-			$mp.append("<p><b>" + data.visitor.nickname +"</b> "+ new Date(data.date).format() + "</p>")
+			$mp.append(formatString(temp, data.visitor.nickname,info,city,new Date(data.date).format("hh:mm:ss")))
 			   .append("<p>" + data.content + "</p>");
 			
 			$('#sendMsgBtn').linkbutton({text: '发送(ctrl+enter)',disabled:false});
 			sending = false;
+			//设置滚动条滚到底部
+			var mp = $("#msgPanel")[0];
+			mp.scrollTop = mp.scrollHeight;
 		};
 
 		ws.onopen = function(evt) {
@@ -25,6 +38,9 @@ function startWebSocket() {
 	}
 }
 
+/**
+ * 建立在线访客服务通道
+ */
 function startOnlineSocket() {
 	var olWs = null;
 	if ('WebSocket' in window)
@@ -37,7 +53,6 @@ function startOnlineSocket() {
 			var rs = eval("("+evt.data+")");
 			var $tree = $("#online");
 			if(rs.status){
-				console.log(rs.data);
 				var rootNode = $tree.tree("getRoot");
 				$tree.tree("append",{parent:rootNode.target,data:rs.data});
 			}else{
@@ -49,16 +64,15 @@ function startOnlineSocket() {
 	}
 }
 
+/**
+ * 发送信息
+ */
 function sendMsg() {
 	if(!window.editor.isEmpty() && ws.readyState == 1 && !sending){
 		$('#sendMsgBtn').linkbutton({text: '正在发送...',disabled:true});
 		sending = true;
 		ws.send(window.editor.html());
 		window.editor.html('');
-
-		var $mp = $("#msgPanel");
-		var ih = $mp[0].scrollHeight;
-		$mp.scrollTop(ih);
 	}
 }
 
@@ -94,6 +108,14 @@ Date.prototype.format = function (format) {
 	return format;
 };
 
+var formatString = function(str) {
+	for ( var i = 1; i < arguments.length; i++) {
+		str = str.replace("$" + i, arguments[i]);
+	}
+	return str;
+};
+
+//在窗口渲染完毕之后，初始化编辑器
 $.parser.onComplete = function(){
 	KindEditor.each({ 
 		'plug-align' : {
@@ -144,6 +166,9 @@ $.parser.onComplete = function(){
 	});
 	window.editor  = KindEditor.create('#content', {
 		themeType : 'qq',
+		pasteType:1,
+		useContextmenu:false,
+		newlineTag:"br",
 		items : [
 		         'bold','italic','underline','fontname','fontsize','forecolor','hilitecolor','plug-align','plug-order','plug-indent'
 		         ]

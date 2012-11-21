@@ -110,8 +110,8 @@ window.key = "<%=key%>";
 				</div>
 			</div>
 			<div region="east" style="width: 200px;border-bottom: none;border-right: none;border-top: none;" >
-				<ul id="online" class="easyui-tree" data-options="animate:true">
-					<li>SK群聊</li>
+				<ul id="online" class="easyui-tree" style="padding: 5px 0;" data-options="animate:true">
+					<li iconCls="icon-users">SK群聊</li>
 				</ul>
 			</div>
 		</div>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.catalina.websocket.MessageInbound;
@@ -19,6 +20,9 @@ public class ServerMessageInbound extends MessageInbound {
 
 	private Visitor vt;
 	private String key;
+	private int count = 0;
+	private Date lastSendDate;
+	private Boolean dispeak = false;
 	public ServerMessageInbound(Visitor vt,String key) {
 		this.vt = vt;
 		this.key = key;
@@ -31,14 +35,29 @@ public class ServerMessageInbound extends MessageInbound {
 
 	@Override
 	protected void onTextMessage(CharBuffer msg) throws IOException {
-		HashMap<String, SocketEntity> onl = InitServlet.getSocketList();
-		Collection<SocketEntity> se = onl.values();
-		for (SocketEntity socketEntity : se) {
-			Msg mg = new Msg(msg, socketEntity.getVisitor());
-			CharBuffer buffer = CharBuffer.wrap(JSONArray.toJSONString(mg));
-			WsOutbound ob = socketEntity.getServerbd().getWsOutbound();
-			ob.writeTextMessage(buffer);
+		Msg mg = new Msg(msg, vt);
+		if(lastSendDate != null && (new Date().getTime() - lastSendDate.getTime()) < 1000*10 && count ==10){
+			mg.setContent(CharBuffer.wrap("对不起，你发送信息的速度太快了哦。"));
+			WsOutbound ob = this.getWsOutbound();
+			ob.writeTextMessage(CharBuffer.wrap(JSONArray.toJSONString(mg)));
 			ob.flush();
+			dispeak = true;
+		}else{
+			if(dispeak){
+				count = 0;
+				dispeak=false;
+			}
+			
+			HashMap<String, SocketEntity> onl = InitServlet.getSocketList();
+			Collection<SocketEntity> se = onl.values();
+			for (SocketEntity socketEntity : se) {
+				CharBuffer buffer = CharBuffer.wrap(JSONArray.toJSONString(mg));
+				WsOutbound ob = socketEntity.getServerbd().getWsOutbound();
+				ob.writeTextMessage(buffer);
+				ob.flush();
+			}
+			lastSendDate = new Date();
+			count++;
 		}
 	}
 
