@@ -84,7 +84,7 @@ $(function(){
 });
 <%} %>
 </script>
-<script charset="utf-8" src="js/core.js?ver=1.2"></script>
+<script charset="utf-8" src="js/core.js?ver=1.3"></script>
 </head>
 
 <body <%= (isIE || nickName==null ? "" : "onload='startWebSocket()'") %>>
@@ -100,7 +100,7 @@ $(function(){
 	<%
 	}else if(nickName!=null){
 	%>
-	<div class="easyui-dialog" title="SK群聊--<%=nickName%>" data-options="width:700,height:500,iconCls:'icon-sum',closable: false,   
+	<div class="easyui-dialog" title="SK群聊(v1.0)" data-options="width:700,height:500,iconCls:'icon-sum',closable: false,   
     cache: false,maximizable:true">
 		<div class="easyui-layout" fit="true">
 			<div region="center" border="false">
@@ -127,9 +127,12 @@ $(function(){
 							<li iconCls="icon-users">SK群聊</li>
 						</ul>
 					</div>
-					<div region="south" style="height: 160px;border-bottom: none;border-right: none;border-left: none;padding: 3px;">
-						<p>后台代码：<br/><a href="https://github.com/btboys/sk" target="_blank">https://github.com/btboys/sk</a></p>
-						<p>作者：____′↘夏悸	<br/><a href="http://bbs.btboys.com" target="_blank">easyui社区出品</a></p>
+					<div region="south" style="height: 160px;border-bottom: none;border-right: none;border-left: none;padding: 5px;">
+						<p>后台代码:</p>
+						<p><a href="https://github.com/btboys/sk" target="_blank">tomcat7版本</a></p>
+						<p><a href="https://github.com/btboys/sk/tree/jetty" target="_blank">jetty版本</a></p>
+						<p>作者：<a href="http://weibo.com/521090828" target="_blank">____′↘夏悸</a>	</p>
+						<p><a href="http://bbs.btboys.com" target="_blank">easyui社区出品</a></p>
 					</div>
 				</div>
 			</div>

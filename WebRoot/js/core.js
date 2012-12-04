@@ -11,25 +11,17 @@ function startWebSocket() {
 		alert("您的浏览器不支持！建议使用Chrome浏览器或者火狐浏览器!");
 
 	if(ws){
-		var temp = '<p><b>$1</b><sub>(<span title="$2">$3</span>) $4<sub></p>';
+		
 		ws.onmessage = function(evt) {
 			var data = eval("("+evt.data+")");
-			var city = "未知";
-			var info = "IP:"+data.visitor.ip;
-			if(data.visitor.city){
-				city = data.visitor.cit;
-				info += " "+data.visitor.country + " " +data.visitor.province+ " " +data.visitor.isp;
-			}
 			var $mp = $("#msgPanel");
-			$mp.append(formatString(temp, data.visitor.nickname,info,city,new Date(data.date).format("hh:mm:ss")))
-			   .append("<p>" + data.content + "</p>");
-			
+			$mp.append(bulidMsg(data));
+			saveMsg(data);
 			$('#sendMsgBtn').linkbutton({text: '发送(ctrl+enter)',disabled:false});
 			sending = false;
 			//设置滚动条滚到底部
 			var mp = $("#msgPanel")[0];
 			mp.scrollTop = mp.scrollHeight;
-			saveMsg(data);
 			
 			//保证不掉线
 			if(stautsInv){
@@ -43,6 +35,16 @@ function startWebSocket() {
 		ws.onopen = function(evt) {
 			startOnlineSocket();
 			$('#sendMsgBtn').linkbutton({ text: '发送(ctrl+enter)'}).click(sendMsg);
+			if(window.localStorage){
+				var msgData = localStorage.getItem("sk_loc_msg_data") ? eval(localStorage.getItem("sk_loc_msg_data")) : [];
+				if(msgData){
+					var msg = [];
+					$.each(msgData,function(){
+						msg.push(bulidMsg(this));
+					});
+					$("#msgPanel").html(msg.join(""));
+				}
+			}
 		};
 		
 		ws.onerror = function(evt){
@@ -111,6 +113,17 @@ function sendMsg() {
 	}
 }
 
+function bulidMsg(data){
+	var temp = '<p><b>$1</b><sub>(<span title="$2">$3</span>) $4<sub></p>';
+	var city = "未知";
+	var info = "IP:"+data.visitor.ip;
+	if(data.visitor.city){
+		city = data.visitor.cit;
+		info += " "+data.visitor.country + " " +data.visitor.province+ " " +data.visitor.isp;
+	}
+	return formatString(temp, data.visitor.nickname,info,city,new Date(data.date).format("hh:mm:ss"))+"<p>" + data.content + "</p>";
+}
+
 //时间格式化
 Date.prototype.format = function (format) {
 	/*
@@ -170,7 +183,7 @@ function obj2str(o) {
 }
 
 function saveMsg(msg){
-	if(window.localStorage){
+	if(window.localStorage && msg.visitor.nickname != "小K机器人"){
 		var msgData = localStorage.getItem("sk_loc_msg_data") ? eval(localStorage.getItem("sk_loc_msg_data")) : [];
 		msgData.push(msg);
 		localStorage.setItem("sk_loc_msg_data",obj2str(msgData));
