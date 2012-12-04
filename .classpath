@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Sun JDK 1.6.0_13"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.j2eedt.core.MYECLIPSE_JAVAEE_5_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/fastjson-1.1.24.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jetty-util-8.1.8.v20121106.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jetty-websocket-8.1.8.v20121106.jar" sourcepath="G:/Users/east.com/.m2/repository/org/eclipse/jetty/jetty-websocket/8.1.8.v20121106/jetty-websocket-8.1.8.v20121106-sources.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jetty-io-8.1.8.v20121106.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jetty-http-8.1.8.v20121106.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jetty-server-8.1.8.v20121106.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jetty-continuation-8.1.8.v20121106.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpclient-4.2.2.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpcore-4.2.2.jar"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>
