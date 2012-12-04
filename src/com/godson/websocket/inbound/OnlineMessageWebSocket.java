@@ -44,7 +44,7 @@ public class OnlineMessageWebSocket implements OnTextMessage {
 			if(omi != null){
 				Connection con = omi.getConnection();
 				if(con!=null && con.isOpen()){
-					con.sendMessage("{\"status\":"+(isOnline?"true":"false")+",\"data\":["+data+"]}");
+					con.sendMessage("{\"status\":"+(isOnline?"true":"false")+",\"total\":"+InitServlet.getNicknames().size()+",\"data\":["+data+"]}");
 				}
 			}
 		}
@@ -52,7 +52,7 @@ public class OnlineMessageWebSocket implements OnTextMessage {
 
 	private void initTree(Connection con) throws IOException{
 		List<HashMap<String, Object>> olt = onlineTree();
-		con.sendMessage("{\"status\":true,\"data\":"+JSONArray.toJSONString(olt)+"}");
+		con.sendMessage("{\"status\":true,\"total\":"+olt.size()+",\"data\":"+JSONArray.toJSONString(olt)+"}");
 	}
 
 	private static List<HashMap<String, Object>> onlineTree() {

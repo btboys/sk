@@ -1,4 +1,4 @@
-var ws = null,sending = false;
+var ws = null,sending = false,stautsInv,onlStautsInv;
 /**
  * 建立信息服务通道
  */
@@ -30,6 +30,14 @@ function startWebSocket() {
 			var mp = $("#msgPanel")[0];
 			mp.scrollTop = mp.scrollHeight;
 			saveMsg(data);
+			
+			//保证不掉线
+			if(stautsInv){
+				clearInterval(stautsInv);
+			}
+			stautsInv = setInterval(function(){
+				ws.send("");
+			},4*60*1000);
 		};
 
 		ws.onopen = function(evt) {
@@ -42,7 +50,7 @@ function startWebSocket() {
 		};
 		
 		ws.onclose = function(){
-			alert("x");
+			$.messager.alert("提示","服务已断开！","info");
 		};
 	}
 }
@@ -51,7 +59,7 @@ function startWebSocket() {
  * 建立在线访客服务通道
  */
 function startOnlineSocket() {
-	var olWs = null;
+	var olWs = null,total;
 	if ('WebSocket' in window)
 		olWs = new WebSocket(window.wsSer+"wsOnline?key="+window.key);
 	else if ('MozWebSocket' in window)
@@ -64,21 +72,31 @@ function startOnlineSocket() {
 			if(rs.status){
 				var rootNode = $tree.tree("getRoot");
 				$tree.tree("append",{parent:rootNode.target,data:rs.data});
+				total = rs.data.length;
 			}else{
 				var node = $tree.tree('find', rs.data);
 				if(node)
 					$tree.tree('remove', node.target);
 			}
+			
+			
+			$('#onlPanel').panel("setTitle","当前在线：<b>"+rs.total+"<b/> 人");
 			//保证不掉线
-			setInterval(function(){
+			if(onlStautsInv){
+				clearInterval(onlStautsInv);
+			}
+			onlStautsInv = setInterval(function(){
 				olWs.send("");
-			},30*1000);
+			},4*60*1000);
 		};
 		
 		olWs.onerror = function(evt){
 			$.messager.alert("警告","程序异常！","error");
 		};
-	
+		
+		olWs.onclose = function(){
+			$.messager.alert("提示","服务已断开！","info");
+		};
 	}
 }
 /**
@@ -208,6 +226,7 @@ $.parser.onComplete = function(){
 			});
 		});
 	});
+	
 	window.editor  = KindEditor.create('#content', {
 		themeType : 'qq',
 		pasteType:1,
@@ -217,8 +236,8 @@ $.parser.onComplete = function(){
 		         'bold','italic','underline','fontname','fontsize','forecolor','hilitecolor','plug-align','plug-order','plug-indent'
 		         ]
 	});
-	
-	KindEditor.ctrl(window.editor.cmd.doc.body, 13, sendMsg);
-	KindEditor.ctrl(window.editor.cmd.doc.body, 10, sendMsg);
-	
+	if(window.editor){
+		KindEditor.ctrl(window.editor.cmd.doc.body, 13, sendMsg);
+		KindEditor.ctrl(window.editor.cmd.doc.body, 10, sendMsg);
+	}
 };

@@ -1,24 +1,27 @@
-<%@ page language="java" import="java.util.*,java.net.URLEncoder,java.net.URLDecoder" pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.util.*,java.net.URLEncoder,java.net.URLDecoder,com.godson.websocket.servlet.InitServlet" pageEncoding="UTF-8"%>
 <%
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://"+ request.getServerName() + ":" + request.getServerPort()+ path + "/";
 	String wsPath = "ws://"+ request.getServerName() + ":" + request.getServerPort()+ path + "/";
 	request.setCharacterEncoding("UTF-8");
 	String nickName = request.getParameter("nickName");
-
-	if(nickName!=null){
+	
+	if(nickName != null){
+		if(InitServlet.getNicknames().containsValue(nickName)){
+			response.sendRedirect(basePath+"?error=repeat");
+		}
 		Cookie ck = new Cookie("nickName",URLEncoder.encode(nickName,"utf-8"));
 		ck.setMaxAge(3600*1000);
 		response.addCookie(ck);
-		request.getRequestDispatcher("/").forward(request, response);
-	}else{
-		Cookie cookies[]=request.getCookies(); 
-		if(cookies!=null){
-			for(int i = 0;i < cookies.length; i++){
-				Cookie ck = cookies[i];
-				if(ck.getName().equals("nickName")){
-					nickName = URLDecoder.decode(ck.getValue(),"utf-8");
-				}
+		response.sendRedirect(basePath);
+	}
+	
+	Cookie cookies[]=request.getCookies(); 
+	if(cookies!=null){
+		for(int i = 0;i < cookies.length; i++){
+			Cookie ck = cookies[i];
+			if(ck.getName().equals("nickName")){
+				nickName = URLDecoder.decode(ck.getValue(),"utf-8");
 			}
 		}
 	}
@@ -73,8 +76,15 @@ border-radius: 10px;
 window.wsSer = "<%=wsPath%>";
 window.nickName = "<%=nickName%>";
 window.key = "<%=key%>";
+<%
+if(request.getParameter("error")!=null&&request.getParameter("error").equals("repeat")){
+%>
+$(function(){
+	$.messager.alert("提示","您输入的昵称已经存在哦....","info");
+});
+<%} %>
 </script>
-<script charset="utf-8" src="js/core.js"></script>
+<script charset="utf-8" src="js/core.js?ver=1.2"></script>
 </head>
 
 <body <%= (isIE || nickName==null ? "" : "onload='startWebSocket()'") %>>
@@ -112,7 +122,7 @@ window.key = "<%=key%>";
 			</div>
 			<div region="east" style="width: 200px;border-bottom: none;border-right: none;border-top: none;" >
 				<div class="easyui-layout" fit="true" border="false">
-					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;">	
+					<div region="center" border="false" id="onlPanel" style="padding: 0 10px;" title="&nbsp;">	
 						<ul id="online" class="easyui-tree" style="padding: 5px 0;" data-options="animate:true">
 							<li iconCls="icon-users">SK群聊</li>
 						</ul>

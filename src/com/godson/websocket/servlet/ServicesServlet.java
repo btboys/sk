@@ -23,6 +23,7 @@ public class ServicesServlet extends WebSocketServlet {
 
 	public WebSocket doWebSocketConnect(HttpServletRequest req, String arg1) {
 		Visitor vt = Utils.getVistorInfo(req);
+		InitServlet.getNicknames().put(req.getParameter("key"), vt.getNickname());
 		return new ServerMessageWebSocket(vt,req.getParameter("key"));
 	}
 }
