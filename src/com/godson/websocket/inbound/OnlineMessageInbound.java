@@ -65,7 +65,7 @@ public class OnlineMessageInbound extends MessageInbound {
 		for (SocketEntity socketEntity : se) {
 			OnlineMessageInbound  omi = socketEntity.getOnlinebd();
 			if(omi != null){
-				CharBuffer buffer = CharBuffer.wrap("{\"status\":"+(isOnline?"true":"false")+",\"data\":["+data+"]}");
+				CharBuffer buffer = CharBuffer.wrap("{\"status\":"+(isOnline?"true":"false")+",\"total\":"+InitServlet.getNicknames().size()+",\"data\":["+data+"]}");
 				WsOutbound ob = socketEntity.getOnlinebd().getWsOutbound();
 				ob.writeTextMessage(buffer);
 				ob.flush();
@@ -75,7 +75,7 @@ public class OnlineMessageInbound extends MessageInbound {
 
 	private void initTree(WsOutbound outbound) throws IOException {
 		List<HashMap<String, Object>> olt = onlineTree();
-		CharBuffer buffer = CharBuffer.wrap("{\"status\":true,\"data\":"+JSONArray.toJSONString(olt)+"}");
+		CharBuffer buffer = CharBuffer.wrap("{\"status\":true,\"total\":"+InitServlet.getNicknames().size()+",\"data\":"+JSONArray.toJSONString(olt)+"}");
 		outbound.writeTextMessage(buffer);
 		outbound.flush();
 	}

@@ -1,6 +1,7 @@
 package com.godson.util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +57,14 @@ public final class Utils {
 	public final static Visitor getVistorInfo(HttpServletRequest request) {
 		String ip = getIpAddr(request);
 		Visitor vt = null;
+		String nickname = request.getParameter("nk");
+		try {
+			nickname = new String(nickname.getBytes("8859_1"), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+		vt = new Visitor(nickname, ip);
 		HttpGet httpGet = new HttpGet("http://ip.taobao.com/service/getIpInfo.php?ip=" + ip);
 		try {
 			HttpResponse response = new DefaultHttpClient().execute(httpGet);
@@ -63,12 +72,11 @@ public final class Utils {
 				String result = EntityUtils.toString(response.getEntity());
 				JSONObject obj = JSONObject.parseObject(result);
 				if (obj.getIntValue("code") == 0) {
-					String nickname = request.getParameter("nk");
-					nickname = new String(nickname.getBytes("8859_1"), "utf-8");
-					String city = request.getParameter("city");
-					String province = request.getParameter("region");
-					String country = request.getParameter("country");
-					String isp = request.getParameter("isp");
+					JSONObject data = obj.getJSONObject("data");
+					String city = data.getString("city");
+					String province = data.getString("region");
+					String country = data.getString("country");
+					String isp = data.getString("isp");
 					vt = new Visitor(nickname, ip, city, province, country, isp);
 				}
 			}

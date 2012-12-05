@@ -24,6 +24,11 @@ public class Visitor {
 		this.isp = isp;
 	}
 	
+	public Visitor(String nickname, String ip) {
+		this.nickname = nickname;
+		this.ip = ip;
+	}
+
 	public String getNickname() {
 		return nickname;
 	}

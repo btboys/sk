@@ -35,4 +35,8 @@ public class Msg {
 	public void setContent(CharBuffer content) {
 		this.content = content;
 	}
+	
+	public void setVisitor(Visitor visitor) {
+		this.visitor = visitor;
+	}
 }

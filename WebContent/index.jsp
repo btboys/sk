@@ -1,23 +1,27 @@
-<%@ page language="java" import="java.util.*,java.net.URLEncoder,java.net.URLDecoder" pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.util.*,java.net.URLEncoder,java.net.URLDecoder,com.godson.websocket.servlet.InitServlet" pageEncoding="UTF-8"%>
 <%
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://"+ request.getServerName() + ":" + request.getServerPort()+ path + "/";
 	String wsPath = "ws://"+ request.getServerName() + ":" + request.getServerPort()+ path + "/";
 	request.setCharacterEncoding("UTF-8");
 	String nickName = request.getParameter("nickName");
-
-	if(nickName!=null){
+	
+	if(nickName != null){
+		if(InitServlet.getNicknames().containsValue(nickName)){
+			response.sendRedirect(basePath+"?error=repeat");
+		}
 		Cookie ck = new Cookie("nickName",URLEncoder.encode(nickName,"utf-8"));
 		ck.setMaxAge(3600*1000);
 		response.addCookie(ck);
-	}else{
-		Cookie cookies[]=request.getCookies(); 
-		if(cookies!=null){
-			for(int i = 0;i < cookies.length; i++){
-				Cookie ck = cookies[i];
-				if(ck.getName().equals("nickName")){
-					nickName = URLDecoder.decode(ck.getValue(),"utf-8");
-				}
+		response.sendRedirect(basePath);
+	}
+	
+	Cookie cookies[]=request.getCookies(); 
+	if(cookies!=null){
+		for(int i = 0;i < cookies.length; i++){
+			Cookie ck = cookies[i];
+			if(ck.getName().equals("nickName")){
+				nickName = URLDecoder.decode(ck.getValue(),"utf-8");
 			}
 		}
 	}
@@ -72,8 +76,15 @@ border-radius: 10px;
 window.wsSer = "<%=wsPath%>";
 window.nickName = "<%=nickName%>";
 window.key = "<%=key%>";
+<%
+if(request.getParameter("error")!=null&&request.getParameter("error").equals("repeat")){
+%>
+$(function(){
+	$.messager.alert("提示","您输入的昵称已经存在哦....","info");
+});
+<%} %>
 </script>
-<script charset="utf-8" src="js/core.js"></script>
+<script charset="utf-8" src="js/core.js?ver=1.3"></script>
 </head>
 
 <body <%= (isIE || nickName==null ? "" : "onload='startWebSocket()'") %>>
@@ -89,12 +100,12 @@ window.key = "<%=key%>";
 	<%
 	}else if(nickName!=null){
 	%>
-	<div class="easyui-dialog" title="SK群聊--<%=nickName%>" data-options="width:700,height:500,iconCls:'icon-sum',closable: false,   
+	<div class="easyui-dialog" title="SK群聊(v1.0)" data-options="width:700,height:500,iconCls:'icon-sum',closable: false,   
     cache: false,maximizable:true">
 		<div class="easyui-layout" fit="true">
 			<div region="center" border="false">
 				<div class="easyui-layout" fit="true" border="false">
-					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;">	
+					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;word-break: break-all;">	
 						
 					</div>
 					<div region="south" style="height: 160px" border="false">
@@ -111,14 +122,17 @@ window.key = "<%=key%>";
 			</div>
 			<div region="east" style="width: 200px;border-bottom: none;border-right: none;border-top: none;" >
 				<div class="easyui-layout" fit="true" border="false">
-					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;">	
+					<div region="center" border="false" id="onlPanel" style="padding: 0 10px;" title="&nbsp;">	
 						<ul id="online" class="easyui-tree" style="padding: 5px 0;" data-options="animate:true">
 							<li iconCls="icon-users">SK群聊</li>
 						</ul>
 					</div>
-					<div region="south" style="height: 160px;border-bottom: none;border-right: none;border-left: none;padding: 3px;">
-						<p>后台代码：<br/><a href="https://github.com/btboys/sk" target="_blank">https://github.com/btboys/sk</a></p>
-						<p>作者：____′↘夏悸	<br/><a href="https://bbs.btboys.com" target="_blank">easyui社区出品</a></p>
+					<div region="south" style="height: 160px;border-bottom: none;border-right: none;border-left: none;padding: 5px;">
+						<p>后台代码:</p>
+						<p><a href="https://github.com/btboys/sk" target="_blank">tomcat7版本</a></p>
+						<p><a href="https://github.com/btboys/sk/tree/jetty" target="_blank">jetty版本</a></p>
+						<p>作者：<a href="http://weibo.com/521090828" target="_blank">____′↘夏悸</a>	</p>
+						<p><a href="http://bbs.btboys.com" target="_blank">easyui社区出品</a></p>
 					</div>
 				</div>
 			</div>

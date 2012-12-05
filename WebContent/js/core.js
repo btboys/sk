@@ -1,4 +1,4 @@
-var ws = null,sending = false;
+var ws = null,sending = false,stautsInv,onlStautsInv;
 /**
  * 建立信息服务通道
  */
@@ -11,29 +11,48 @@ function startWebSocket() {
 		alert("您的浏览器不支持！建议使用Chrome浏览器或者火狐浏览器!");
 
 	if(ws){
-		var temp = '<p><b>$1</b><sub>(<span title="$2">$3</span>) $4<sub></p>';
+		
 		ws.onmessage = function(evt) {
 			var data = eval("("+evt.data+")");
-			var city = "未知";
-			var info = "IP:"+data.visitor.ip;
-			if(data.visitor.city){
-				city = data.visitor.cit;
-				info += " "+data.visitor.country + " " +data.visitor.province+ " " +data.visitor.isp;
-			}
 			var $mp = $("#msgPanel");
-			$mp.append(formatString(temp, data.visitor.nickname,info,city,new Date(data.date).format("hh:mm:ss")))
-			   .append("<p>" + data.content + "</p>");
-			
+			$mp.append(bulidMsg(data));
+			saveMsg(data);
 			$('#sendMsgBtn').linkbutton({text: '发送(ctrl+enter)',disabled:false});
 			sending = false;
 			//设置滚动条滚到底部
 			var mp = $("#msgPanel")[0];
 			mp.scrollTop = mp.scrollHeight;
+			
+			//保证不掉线
+			if(stautsInv){
+				clearInterval(stautsInv);
+			}
+			stautsInv = setInterval(function(){
+				ws.send("");
+			},4*60*1000);
 		};
 
 		ws.onopen = function(evt) {
 			startOnlineSocket();
 			$('#sendMsgBtn').linkbutton({ text: '发送(ctrl+enter)'}).click(sendMsg);
+			if(window.localStorage){
+				var msgData = localStorage.getItem("sk_loc_msg_data") ? eval(localStorage.getItem("sk_loc_msg_data")) : [];
+				if(msgData){
+					var msg = [];
+					$.each(msgData,function(){
+						msg.push(bulidMsg(this));
+					});
+					$("#msgPanel").html(msg.join(""));
+				}
+			}
+		};
+		
+		ws.onerror = function(evt){
+			$.messager.alert("警告","连接异常！","error");
+		};
+		
+		ws.onclose = function(){
+			$.messager.alert("提示","服务已断开！","info");
 		};
 	}
 }
@@ -42,7 +61,7 @@ function startWebSocket() {
  * 建立在线访客服务通道
  */
 function startOnlineSocket() {
-	var olWs = null;
+	var olWs = null,total;
 	if ('WebSocket' in window)
 		olWs = new WebSocket(window.wsSer+"wsOnline?key="+window.key);
 	else if ('MozWebSocket' in window)
@@ -55,15 +74,33 @@ function startOnlineSocket() {
 			if(rs.status){
 				var rootNode = $tree.tree("getRoot");
 				$tree.tree("append",{parent:rootNode.target,data:rs.data});
+				total = rs.data.length;
 			}else{
 				var node = $tree.tree('find', rs.data);
 				if(node)
 					$tree.tree('remove', node.target);
 			}
+			
+			
+			$('#onlPanel').panel("setTitle","当前在线：<b>"+rs.total+"<b/> 人");
+			//保证不掉线
+			if(onlStautsInv){
+				clearInterval(onlStautsInv);
+			}
+			onlStautsInv = setInterval(function(){
+				olWs.send("");
+			},4*60*1000);
+		};
+		
+		olWs.onerror = function(evt){
+			$.messager.alert("警告","程序异常！","error");
+		};
+		
+		olWs.onclose = function(){
+			$.messager.alert("提示","服务已断开！","info");
 		};
 	}
 }
-
 /**
  * 发送信息
  */
@@ -74,6 +111,17 @@ function sendMsg() {
 		ws.send(window.editor.html());
 		window.editor.html('');
 	}
+}
+
+function bulidMsg(data){
+	var temp = '<p><b>$1</b><sub>(<span title="$2">$3</span>) $4<sub></p>';
+	var city = "未知";
+	var info = "IP:"+data.visitor.ip;
+	if(data.visitor.city){
+		city = data.visitor.city;
+		info += " "+data.visitor.country + " " +data.visitor.province+ " " +data.visitor.isp;
+	}
+	return formatString(temp, data.visitor.nickname,info,city,new Date(data.date).format("hh:mm:ss"))+"<p>" + data.content + "</p>";
 }
 
 //时间格式化
@@ -114,6 +162,33 @@ var formatString = function(str) {
 	}
 	return str;
 };
+
+function obj2str(o) {
+    var r = [];
+    if (typeof o == "string") return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";
+    if (typeof o == "object") {
+        if (!o.sort) {
+            for (var i in o) r.push(i + ":" + obj2str(o[i]));
+            if ( !! document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {
+                r.push("toString:" + o.toString.toString());
+            }
+            r = "{" + r.join() + "}";
+        } else {
+            for (var i = 0; i < o.length; i++) r.push(obj2str(o[i]));
+            r = "[" + r.join() + "]";
+        }
+        return r;
+    }
+    return o.toString();
+}
+
+function saveMsg(msg){
+	if(window.localStorage && msg.visitor.nickname != "小K机器人"){
+		var msgData = localStorage.getItem("sk_loc_msg_data") ? eval(localStorage.getItem("sk_loc_msg_data")) : [];
+		msgData.push(msg);
+		localStorage.setItem("sk_loc_msg_data",obj2str(msgData));
+	}
+}
 
 //在窗口渲染完毕之后，初始化编辑器
 $.parser.onComplete = function(){
@@ -164,6 +239,7 @@ $.parser.onComplete = function(){
 			});
 		});
 	});
+	
 	window.editor  = KindEditor.create('#content', {
 		themeType : 'qq',
 		pasteType:1,
@@ -173,8 +249,8 @@ $.parser.onComplete = function(){
 		         'bold','italic','underline','fontname','fontsize','forecolor','hilitecolor','plug-align','plug-order','plug-indent'
 		         ]
 	});
-	
-	KindEditor.ctrl(window.editor.cmd.doc.body, 13, sendMsg);
-	KindEditor.ctrl(window.editor.cmd.doc.body, 10, sendMsg);
-	
+	if(window.editor){
+		KindEditor.ctrl(window.editor.cmd.doc.body, 13, sendMsg);
+		KindEditor.ctrl(window.editor.cmd.doc.body, 10, sendMsg);
+	}
 };

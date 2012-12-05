@@ -24,6 +24,7 @@ public class ServicesServlet extends WebSocketServlet {
 	@Override
 	protected StreamInbound createWebSocketInbound(String arg0,HttpServletRequest req) {
         Visitor vt = Utils.getVistorInfo(req);
+        InitServlet.getNicknames().put(req.getParameter("key"), vt.getNickname());
 		return new ServerMessageInbound(vt,req.getParameter("key"));
 	}
 }
