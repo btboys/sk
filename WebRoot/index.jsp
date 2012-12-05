@@ -105,7 +105,7 @@ $(function(){
 		<div class="easyui-layout" fit="true">
 			<div region="center" border="false">
 				<div class="easyui-layout" fit="true" border="false">
-					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;">	
+					<div region="center" border="false" id="msgPanel" style="padding: 0 10px;word-break: break-all;">	
 						
 					</div>
 					<div region="south" style="height: 160px" border="false">

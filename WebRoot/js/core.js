@@ -118,7 +118,7 @@ function bulidMsg(data){
 	var city = "未知";
 	var info = "IP:"+data.visitor.ip;
 	if(data.visitor.city){
-		city = data.visitor.cit;
+		city = data.visitor.city;
 		info += " "+data.visitor.country + " " +data.visitor.province+ " " +data.visitor.isp;
 	}
 	return formatString(temp, data.visitor.nickname,info,city,new Date(data.date).format("hh:mm:ss"))+"<p>" + data.content + "</p>";
