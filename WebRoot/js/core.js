@@ -14,15 +14,16 @@ function startWebSocket() {
 		
 		ws.onmessage = function(evt) {
 			var data = eval("("+evt.data+")");
-			var $mp = $("#msgPanel");
-			$mp.append(bulidMsg(data));
-			saveMsg(data);
-			$('#sendMsgBtn').linkbutton({text: '发送(ctrl+enter)',disabled:false});
-			sending = false;
-			//设置滚动条滚到底部
-			var mp = $("#msgPanel")[0];
-			mp.scrollTop = mp.scrollHeight;
-			
+			switch (data.type) {
+			case 'msg':
+				writeMsg(data.msg);
+				break;
+			case 'vt':
+				bulidTree(data.msg);
+				break;
+			default:
+				break;
+			}
 			//保证不掉线
 			if(stautsInv){
 				clearInterval(stautsInv);
@@ -33,7 +34,6 @@ function startWebSocket() {
 		};
 
 		ws.onopen = function(evt) {
-			startOnlineSocket();
 			$('#sendMsgBtn').linkbutton({ text: '发送(ctrl+enter)'}).click(sendMsg);
 			if(window.localStorage){
 				var msgData = localStorage.getItem("sk_loc_msg_data") ? eval(localStorage.getItem("sk_loc_msg_data")) : [];
@@ -57,49 +57,31 @@ function startWebSocket() {
 	}
 }
 
-/**
- * 建立在线访客服务通道
- */
-function startOnlineSocket() {
-	var olWs = null,total;
-	if ('WebSocket' in window)
-		olWs = new WebSocket(window.wsSer+"wsOnline?key="+window.key);
-	else if ('MozWebSocket' in window)
-		olWs = new MozWebSocket(window.wsSer+"wsOnline?key="+window.key);
+function writeMsg(data){
+	var $mp = $("#msgPanel");
+	$mp.append(bulidMsg(data));
+	saveMsg(data);
+	$('#sendMsgBtn').linkbutton({text: '发送(ctrl+enter)',disabled:false});
+	sending = false;
+	//设置滚动条滚到底部
+	var mp = $("#msgPanel")[0];
+	mp.scrollTop = mp.scrollHeight;
+}
 
-	if(olWs){
-		olWs.onmessage = function(evt) {
-			var rs = eval("("+evt.data+")");
-			var $tree = $("#online");
-			if(rs.status){
-				var rootNode = $tree.tree("getRoot");
-				$tree.tree("append",{parent:rootNode.target,data:rs.data});
-				total = rs.data.length;
-			}else{
-				var node = $tree.tree('find', rs.data);
-				if(node)
-					$tree.tree('remove', node.target);
-			}
-			
-			
-			$('#onlPanel').panel("setTitle","当前在线：<b>"+rs.total+"<b/> 人");
-			//保证不掉线
-			if(onlStautsInv){
-				clearInterval(onlStautsInv);
-			}
-			onlStautsInv = setInterval(function(){
-				olWs.send("");
-			},4*60*1000);
-		};
-		
-		olWs.onerror = function(evt){
-			$.messager.alert("警告","程序异常！","error");
-		};
-		
-		olWs.onclose = function(){
-			$.messager.alert("提示","服务已断开！","info");
-		};
+function bulidTree(data){
+	console.log(data);
+	var $tree = $("#online");
+	if(data.type == 'append'){
+		var rootNode = $tree.tree("getRoot");
+		$tree.tree("append",{parent:rootNode.target,data:data.data});
+	}else{
+		var node = $tree.tree('find', data.data);
+		if(node)
+			$tree.tree('remove', node.target);
 	}
+	
+	
+	$('#onlPanel').panel("setTitle","当前在线：<b>"+data.total+"<b/> 人");
 }
 /**
  * 发送信息

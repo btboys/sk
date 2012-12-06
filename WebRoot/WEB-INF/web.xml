@@ -13,17 +13,7 @@
   <servlet-mapping>
     <servlet-name>ServicesServlet</servlet-name>
     <url-pattern>/wsServices</url-pattern>
-  </servlet-mapping>	
-  
-  <servlet>
-    <servlet-name>OnlineServlet</servlet-name>
-    <servlet-class>com.godson.websocket.servlet.OnlineServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>OnlineServlet</servlet-name>
-    <url-pattern>/wsOnline</url-pattern>
-  </servlet-mapping>	
+  </servlet-mapping>
   
   <servlet>  
     <servlet-name>initServlet</servlet-name>  
