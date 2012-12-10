@@ -1,6 +1,5 @@
 package com.godson.websocket;
 
-import com.godson.websocket.inbound.OnlineMessageInbound;
 import com.godson.websocket.inbound.ServerMessageInbound;
 
 /**
@@ -11,7 +10,6 @@ import com.godson.websocket.inbound.ServerMessageInbound;
 public class SocketEntity {
 
 	private ServerMessageInbound serverbd;
-	private OnlineMessageInbound onlinebd;
 	private Visitor visitor;
 	
 	public ServerMessageInbound getServerbd() {
@@ -19,12 +17,6 @@ public class SocketEntity {
 	}
 	public void setServerbd(ServerMessageInbound serverbd) {
 		this.serverbd = serverbd;
-	}
-	public OnlineMessageInbound getOnlinebd() {
-		return onlinebd;
-	}
-	public void setOnlinebd(OnlineMessageInbound onlinebd) {
-		this.onlinebd = onlinebd;
 	}
 	public Visitor getVisitor() {
 		return visitor;
